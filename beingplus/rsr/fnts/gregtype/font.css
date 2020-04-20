@@ -1,0 +1,47 @@
+@font-face {
+  font-family: 'gregtypeHeavy';
+  src: url('gregtypeHeavy.eot');
+  src: url('gregtypeHeavy.woff2') format('woff2'),
+       url('gregtypeHeavy.woff') format('woff'),
+       url('gregtypeHeavy.ttf') format('truetype'),
+       url('gregtypeHeavy.svg#gregtypeHeavy') format('svg'),
+       url('gregtypeHeavy.eot?#iefix') format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'gregtypeBold';
+  src: url('gregtypeBold.eot');
+  src: url('gregtypeBold.woff2') format('woff2'),
+       url('gregtypeBold.woff') format('woff'),
+       url('gregtypeBold.ttf') format('truetype'),
+       url('gregtypeBold.svg#gregtypeBold') format('svg'),
+       url('gregtypeBold.eot?#iefix') format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'gregtypeRegular';
+  src: url('gregtypeRegular.eot');
+  src: url('gregtypeRegular.woff2') format('woff2'),
+       url('gregtypeRegular.woff') format('woff'),
+       url('gregtypeRegular.ttf') format('truetype'),
+       url('gregtypeRegular.svg#gregtypeRegular') format('svg'),
+       url('gregtypeRegular.eot?#iefix') format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'gregtypemediumRegular';
+  src: url('gregtypemediumRegular.eot');
+  src: url('gregtypemediumRegular.woff2') format('woff2'),
+       url('gregtypemediumRegular.woff') format('woff'),
+       url('gregtypemediumRegular.ttf') format('truetype'),
+       url('gregtypemediumRegular.svg#gregtypemediumRegular') format('svg'),
+       url('gregtypemediumRegular.eot?#iefix') format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="MARKETAPP">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Market place</title>
+    <link rel="stylesheet" href="lib/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="lib/on-screen-keyboard-master/onScreenKeyboard.css">
+    <link rel="stylesheet" href="lib/semantic/semantic.min.css">
+    <!-- <link rel="stylesheet" href="lib/UI-Dropdown-master/dropdown.min.css"> -->
+    <link rel="stylesheet" href="lib/angularMultipleSelect/build/multiple-select.min.css">
+    <link rel="stylesheet" href="lib/semanticUiAlert/semantic-ui-alert.css">
+    <link rel="stylesheet" href="lib/simplebar/dist/simplebar.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="lib/font-awesome/web-fonts-with-css/css/fontawesome-all.min.css">
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+    <script src="lib/on-screen-keyboard-master/jquery.onScreenKeyboard.min.js"></script>
+
+    <style>
+        .meno{color: red !important}
+    </style>
+</head>
+<body ng-element-ready ng-controller="appController" data-simplebar data-simplebar-auto-hide="false">
+    <div class="ui grid">
+        <div class="seven wide column bg">
+            <div class="cart-side full-height p10">
+                <div class="button-sector">
+                    <button class="ui basic button border-button-red bg-darkgray">
+                        <i class="icon time"></i>
+                        {{ clock | date:'HH:mm:ss' }}
+                    </button>
+                    <div class="align-right">
+                        <a href="" ng-click="showModal('.small.modal')" class="ui icon button border-button-red">
+                            <i class="fa fa-window-close"></i>
+                            Close
+                        </a>
+                    </div>
+                    <!-- <div class="ui small basic icon buttons">
+                        <button class="ui button border-button-red"><i class="fa fa-plus"></i></button>
+                        <button class="ui button border-button-red"><i class="fa fa-minus"></i></button>
+                    </div> -->
+                </div>
+                <div class="choice-client-side">
+                    <form class="ui form">
+                        <div class="field">
+                            <label class="vertical-center">
+                                <span class="high-text">Choisissez un client</span>
+                                <!-- <div class="align-right">
+                                    <button class="ui icon button border-button-red bg-darkgray">
+                                        <i class="fa fa-ticket-alt"></i>
+                                    </button>
+                                    <button class="ui icon button border-button-red bg-darkgray">
+                                        <i class="fa fa-user-plus"></i>
+                                    </button>
+                                </div> -->
+                            </label>
+                            <select name="user" class="ui search dropdown" ng-model="user">
+                                <option value="">Choisir un client</option>
+                                <option value="{{m.id}}" ng-repeat="m in clients">{{m.name}}</option>
+                            </select>
+                        </div>
+                    </form>
+                    <form class="ui form mt10" ng-submit="searchAndAdd(code)">
+                        <div class="field">
+                            <input type="text" class="osk-trigger" ng-model="code" placeholder="Barcode Scanner">
+                            <button type="submit" ng-hide="true"></button>
+                        </div>
+                    </form>
+                </div>
+                <div class="cart-list" id="listcart">
+                    <table class="ui very basic table">
+                        <thead class="head-list">
+                            <tr>
+                                <th></th>
+                                <th>Produit</th>
+                                <th>Prix</th>
+                                <th>Quantité</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="item-cart" ng-repeat="c in cart">
+                                <td>
+                                    <button ng-click="removeToCart($index)" class="ui icon button border-button-red bg-darkgray">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </td>
+                                <td>{{c.intitule}}</td>
+                                <!-- <td>{{c.price | currency: "XAF "}}</td> -->
+                                <td><input type="text" class="ui input small-input" ng-dblclick="activeInput()" ng-readonly="inputStat" ng-model="c.price"></td>
+                                <td>
+                                    <div class="ui icon buttons">
+                                        <button ng-click="substractQte(c)" class="ui button">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                        <input type="number" min="1" max="{{c.stock}}" class="ui button" ng-change="qteOnChange(c.qte)" respect-qte="{{c.stock}}" ng-model="c.qte" style="width: 50px;"/>
+                                        <button ng-click="addQte(c)" class="ui button">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="text-right">{{c.price | total: c.stock : c.qte | currency:'XAF ' : 0 | formatMoney}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="price-sector">
+                    <table class="ui red table">
+                        <tbody>
+                            <tr>
+                                <td>Montant versé</td>
+                                <td class="text-right ui input" style="display: flex;align-items: flex-end">
+                                    <input type="text" style="text-align: right" numeric-only ng-model="verse"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Montant a payer</td>
+                                <td class="text-right">{{cart | totalToPay | currency: 'XAF ' : 0 | formatMoney}}</td>
+                            </tr>
+                            <tr>
+                                <td>Remboursement</td>
+                                <td class="text-right total-color" ng-class="{meno: verse - total < 0}">{{verse - total | currency: 'XAF ' : 0 | formatMoney}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="button-validate-sector">
+                    <div class="ui animated fade button cancel" tabindex="0"  ng-click="emptyCart()">
+                        <div class="visible content">Annuler</div>
+                        <div class="hidden content">
+                            Je prefère annuler
+                        </div>
+                    </div>
+                    <div class="ui animated fade button payment" tabindex="0">
+                        <div class="visible content">Valider</div>
+                        <div class="hidden content">
+                            Passer au paiement
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nine wide column bg">
+            <div class="products-side full-height p10">
+                <div class="button-sector">
+                    <!-- data-simplebar data-simplebar-auto-hide="true" -->
+                    <div class="ui grid">
+                        <!-- <div class="row"> -->
+                            <div class="one wide column">
+                                <!-- <div class="ui grid">
+                                    <div class="one wide column"></div>
+                                    <div class="f wide column"></div>
+                                </div> -->
+                                <button ng-click="selectedItems = []" class="ui icon button border-button-red bg-darkgray">
+                                    <i class="fa fa-home"></i>
+                                </button>
+                            </div>
+                            <div class="eleven wide column">
+                                <!-- <div class="ui fluid multiple search normal selection dropdown">
+                                    <input type="hidden" name="country" ng-model="selectedItems">
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Selectionner une catégorie</div>
+                                    <div class="menu">
+                                        <div class="item" data-value="{{c.id}}" ng-repeat="c in categories">{{c.name}}</div>
+                                    </div>  
+                                </div> -->
+                                <multiple-autocomplete ng-model="selectedItems"
+                                    object-property="name"
+                                    after-select-item="afterSelectItem"
+                                    after-remove-item="afterRemoveItem"
+                                    suggestions-arr="categories">
+                                </multiple-autocomplete>
+                            </div>
+                        <!-- </div> -->
+                    </div>
+                    <!-- <button class="ui basic button border-button-red">
+                        COMPUTERS
+                    </button>
+                    <button class="ui basic button border-button-red">
+                        FRUITS
+                    </button>
+                    <button class="ui basic button border-button-red">
+                        CLOTHINGS
+                    </button>
+                    <button class="ui basic button border-button-red">
+                        SERVICES
+                    </button> -->
+                </div>
+                <div class="search-sector">
+                    <form class="ui form">
+                        <div class="ui icon input full-width">
+                            <i class="search icon"></i>
+                            <input type="text" placeholder="Rechercher..." ng-model="searchProduct">
+                        </div>
+                    </form>
+                </div>
+                <div class="products-sector">
+                    <div class="ui four special cards">
+                        <!-- <a href="" class="red card">
+                            <div class="image">
+                                <img src="images/profile2.jpg">
+                            </div>
+                        </a> -->
+                        <div class="card" ng-repeat="p in searchInList(selectedItems) | filter: searchProduct">
+                            <div class="blurring dimmable image">
+                                <div class="ui dimmer">
+                                    <div class="content">
+                                        <div class="center">
+                                            <div class="ui inverted">{{p.intitule}}</div>
+                                            <div class="ui inverted">{{p.price | currency: 'XAF '}}</div>
+                                            <div class="ui inverted mb5">{{p.stock}} en stock</div>
+                                            <div class="ui inverted button" ng-click="addCart(p)">
+                                                <i class="fa fa-shopping-cart"></i>
+                                                Ajouter
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <img ng-src="{{p.photo}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui small modal">
+        <div class="header">Confirmation</div>
+        <div class="content">
+            <p>Voulez vous vraiment fermer ?</p>
+        </div>
+        <div class="actions">
+            <a class="ui approve positive button" href="/">Oui</a>
+            <div class="ui cancel negative button">Non</div>
+        </div>
+    </div>
+</body>
+    <script src="lib/semantic/semantic.min.js"></script>
+    <!-- <script src="lib/UI-Dropdown-master/dropdown.min.js"></script> -->
+    <script src="lib/semanticUiAlert/semantic-ui-alert.js"></script>
+    <script src="lib/simplebar/dist/simplebar.js"></script>
+    <script src="lib/angular/angular.min.js"></script>
+    <script src="lib/angularMultipleSelect/build/multiple-select.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/services/data.js"></script>
+    <script src="js/controllers/appController.js"></script>
+</html>
